@@ -1,7 +1,7 @@
 #region Parameters
 GO_COMPILER = go
 COMMAND_DIRECTORY = ./cmd
-COMMAND_FILES_EXTENTIONS = go
+COMMAND_FILE_NAME = main.go
 PACKAGE_DIRECTORY = ./pkg
 BINARY_DIRECTORY = ./bin
 PREFIX_TO_PRINTS = === 
@@ -16,7 +16,7 @@ RESET  := $(shell tput -Txterm sgr0)
 #endregion
 
 # Searches for all the executable files that can be compiled in the binary directory
-COMMAND_FILES = $(shell ls -1 $(COMMAND_DIRECTORY) | sed -e 's/\.$(COMMAND_FILES_EXTENTIONS)$$//')
+COMMAND_FILES = $(shell ls -1 $(COMMAND_DIRECTORY))
 
 .PHONY: all $(COMMAND_FILES) run clean
 default: help
@@ -38,14 +38,11 @@ all: $(COMMAND_FILES)
 
 #region Target for each executable files to be compiled
 $(COMMAND_FILES):
-	@# Saves into variable the actual file name
-	$(eval COMMAND_FILE = $@.$(COMMAND_FILES_EXTENTIONS))
-
 	@# Making sure there is binary directory
 	@mkdir -p $(BINARY_DIRECTORY)
 
-	@echo "$(PREFIX_TO_PRINTS)${GREEN}Compiling $(COMMAND_FILE)${RESET}"
-	$(GO_COMPILER) build -o $(BINARY_DIRECTORY)/$@ $(COMMAND_DIRECTORY)/$(COMMAND_FILE)
+	@echo "$(PREFIX_TO_PRINTS)${GREEN}Compiling $@${RESET}"
+	$(GO_COMPILER) build -o $(BINARY_DIRECTORY)/$@ $(COMMAND_DIRECTORY)/$@/$(COMMAND_FILE_NAME)
 #endregion
 
 #region Target for running specific build
