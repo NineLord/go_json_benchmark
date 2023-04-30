@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/urfave/cli/v2"
 )
@@ -67,8 +68,8 @@ func parsePathToSaveFile(arguments *cli.Args) string {
 }
 
 func cliAction(arguments *cli.Context) error {
-	// args := arguments.Args()
-	// pathToSaveFile := parsePathToSaveFile(&args)
+	args := arguments.Args()
+	pathToSaveFile := parsePathToSaveFile(&args)
 
 	numberOfLetters := arguments.Uint("numberOfLetters")
 	depth := arguments.Uint("depth")
@@ -77,11 +78,13 @@ func cliAction(arguments *cli.Context) error {
 	if json, err := utils.GenerateJson(ALPHABET, numberOfLetters, depth, numberOfChildren); err == nil {
 		if printFlag {
 			fmt.Println(json)
+			return nil
 		} else {
-			log.Panic("TODO: write to file")
+			err := os.WriteFile(pathToSaveFile, []byte(strconv.Itoa(json)), 0644)
+			fmt.Println("JSON was saved to", pathToSaveFile)
+			return err
 		}
 	} else {
 		return err
 	}
-	return nil
 }
