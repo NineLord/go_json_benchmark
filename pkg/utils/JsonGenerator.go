@@ -2,12 +2,13 @@ package utils
 
 // #region Imports
 import (
-	. "fmt"
 	jsoniter "github.com/json-iterator/go"
 )
+
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 // #endregion
 
-func Foo() {
-	Println("Hello from Foo")
+func GenerateJson(characterPoll string, numberOfLetters uint, depth uint, numberOfChildren uint) (int, error) {
+	return 5, nil
 }
