@@ -1,14 +1,6 @@
 package utils
 
-// #region Imports
-import (
-	jsoniter "github.com/json-iterator/go"
-)
-
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
-
-// #endregion
-
-func GenerateJson(characterPoll string, numberOfLetters uint, depth uint, numberOfChildren uint) (int, error) {
-	return 5, nil
+func GenerateJson(characterPoll string, numberOfLetters uint, depth uint, numberOfChildren uint) (*map[string]interface{}, error) {
+	var data map[string]interface{} = map[string]interface{}{"apple": 5}
+	return &data, nil
 }

@@ -1,15 +1,20 @@
 package main
 
+//#region Imports
 import (
 	"fmt"
 	"github.com/NineLord/go_json_benchmark/pkg/utils"
+	"github.com/urfave/cli/v2"
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 
-	"github.com/urfave/cli/v2"
+	jsoniter "github.com/json-iterator/go"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+//#endregion
 
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz"
 
@@ -67,7 +72,7 @@ func parsePathToSaveFile(arguments *cli.Args) string {
 	return result
 }
 
-func cliAction(arguments *cli.Context) error {
+func cliAction(arguments *cli.Context) (err error) {
 	args := arguments.Args()
 	pathToSaveFile := parsePathToSaveFile(&args)
 
@@ -75,16 +80,38 @@ func cliAction(arguments *cli.Context) error {
 	depth := arguments.Uint("depth")
 	numberOfChildren := arguments.Uint("numberOfChildren")
 	printFlag := arguments.Bool("print")
-	if json, err := utils.GenerateJson(ALPHABET, numberOfLetters, depth, numberOfChildren); err == nil {
-		if printFlag {
-			fmt.Println(json)
-			return nil
-		} else {
-			err := os.WriteFile(pathToSaveFile, []byte(strconv.Itoa(json)), 0644)
-			fmt.Println("JSON was saved to", pathToSaveFile)
-			return err
-		}
-	} else {
-		return err
+	jsonResult, err := utils.GenerateJson(ALPHABET, numberOfLetters, depth, numberOfChildren)
+	if err != nil {
+		return
 	}
+
+	if printFlag {
+		var byteArray []byte
+		byteArray, err = json.MarshalIndent(jsonResult, "", "  ")
+		if err != nil {
+			return
+		}
+		fmt.Println(string(byteArray))
+	} else {
+		var file *os.File
+		file, err = os.Create(pathToSaveFile)
+		if err != nil {
+			return
+		}
+		defer func() {
+			closeError := file.Close()
+			if err == nil {
+				err = closeError
+			}
+		}()
+
+		encoder := json.NewEncoder(file)
+		err = encoder.Encode(jsonResult)
+		if err != nil {
+			return
+		}
+		fmt.Println("JSON was saved to", pathToSaveFile)
+	}
+
+	return nil
 }
