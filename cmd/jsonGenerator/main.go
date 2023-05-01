@@ -3,7 +3,7 @@ package main
 //#region Imports
 import (
 	"fmt"
-	"github.com/NineLord/go_json_benchmark/pkg/utils"
+	"github.com/NineLord/go_json_benchmark/pkg/utils/JsonGenerator"
 	"github.com/urfave/cli/v2"
 	"log"
 	"os"
@@ -80,7 +80,7 @@ func cliAction(arguments *cli.Context) (err error) {
 	depth := arguments.Uint("depth")
 	numberOfChildren := arguments.Uint("numberOfChildren")
 	printFlag := arguments.Bool("print")
-	jsonResult, err := utils.GenerateJson(ALPHABET, numberOfLetters, depth, numberOfChildren)
+	jsonResult, err := JsonGenerator.GenerateJson(ALPHABET, numberOfLetters, depth, numberOfChildren)
 	if err != nil {
 		return
 	}

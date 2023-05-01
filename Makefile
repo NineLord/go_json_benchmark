@@ -64,3 +64,5 @@ run: $(TARGET)
 clean:
 	@echo "$(PREFIX_TO_PRINTS)${GREEN}Removing all compiled files${RESET}"
 	rm -rf $(BINARY_DIRECTORY)
+
+# To test generating JSON: `make clean jsonGenerator && clear && ./bin/jsonGenerator -P`
