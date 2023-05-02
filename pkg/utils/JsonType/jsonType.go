@@ -1,8 +1,8 @@
 package JsonType
 
 import (
+	"fmt"
 	"github.com/NineLord/go_json_benchmark/pkg/utils/Randomizer"
-	"log"
 	"strings"
 )
 
@@ -47,8 +47,7 @@ func GetRandomNoneLeafJson(numberOfChildren uint) interface{} {
 	case Object:
 		return make(map[string]interface{})
 	default:
-		log.Panicln("GetRandomNoneLeafJson unknown JSON type", jsonType)
-		return nil
+		panic(fmt.Sprintf("GetRandomNoneLeafJson unknown JSON type: %d", jsonType))
 	}
 }
 
@@ -73,6 +72,6 @@ func GetRandomLeafJson() interface{} {
 		}
 		return stringBuilder.String()
 	default:
-		return nil
+		panic(fmt.Sprintf("GetRandomLeafJson unknown JSON type: %d", jsonType))
 	}
 }

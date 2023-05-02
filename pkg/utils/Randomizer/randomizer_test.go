@@ -21,7 +21,7 @@ func TestGetRandomIndexFromArray(t *testing.T) {
 
 	array := []int{1, 2, 3, 4, 5, 6, 7, 8}
 	for count := 0; count < 100; count++ {
-		result := GetRandomIndexFromArray(&array)
+		result := GetRandomIndexFromArray(array)
 		assertions.GreaterOrEqual(result, 0)
 		assertions.Less(result, len(array))
 	}
