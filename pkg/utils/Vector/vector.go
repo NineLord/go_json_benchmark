@@ -12,20 +12,20 @@ type Vector[T any] struct {
 
 // #region Constructors
 
-func MakeVector[T any](length uint) Vector[T] {
-	return Vector[T]{
+func NewVector[T any](length uint) *Vector[T] {
+	return &Vector[T]{
 		data: make([]T, length),
 	}
 }
 
-func MakeVector2[T any](capacity uint) Vector[T] {
-	return Vector[T]{
+func NewVector2[T any](capacity uint) *Vector[T] {
+	return &Vector[T]{
 		data: make([]T, 0, capacity),
 	}
 }
 
-func MakeVector3[T any](length, capacity uint) Vector[T] {
-	return Vector[T]{
+func NewVector3[T any](length, capacity uint) *Vector[T] {
+	return &Vector[T]{
 		data: make([]T, length, capacity),
 	}
 }
@@ -64,7 +64,7 @@ func (vector *Vector[T]) Len() int {
 
 // #region (Un)Marshaler Interface
 
-func (vector Vector[T]) MarshalJSON() ([]byte, error) { // Shaked-TODO
+func (vector *Vector[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(vector.data)
 }
 

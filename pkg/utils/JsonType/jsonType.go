@@ -28,19 +28,18 @@ var VariantsValueLeafTypes = [4]ValueLeafType{Null, Bool, Number, String}
 var ALPHABET = []rune("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz")
 
 func getRandomNoneLeafJsonType() ValueNonLeafType {
-	// if Randomizer.GetRandomBoolean() { // Shaked-TODO
-	// 	return Array
-	// } else {
-	// 	return Object
-	// }
-	return Array
+	if Randomizer.GetRandomBoolean() {
+		return Array
+	} else {
+		return Object
+	}
 }
 
 func GetRandomNoneLeafJson(numberOfChildren uint) interface{} {
 	jsonType := getRandomNoneLeafJsonType()
 	switch jsonType {
 	case Array:
-		return Vector.MakeVector2[interface{}](numberOfChildren)
+		return Vector.NewVector2[interface{}](numberOfChildren)
 	case Object:
 		return make(map[string]interface{})
 	default:

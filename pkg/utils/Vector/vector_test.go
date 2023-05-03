@@ -8,7 +8,7 @@ import (
 func TestVector_Pop(t *testing.T) {
 	assertions := assert.New(t)
 
-	vector := MakeVector[int](0)
+	vector := NewVector[int](0)
 	vector.Push(1)
 	vector.Push(2)
 	vector.Push(3)
@@ -19,7 +19,7 @@ func TestVector_Pop(t *testing.T) {
 func TestVector_MarshalJSON(t *testing.T) {
 	assertions := assert.New(t)
 
-	vector := MakeVector[int](0)
+	vector := NewVector[int](0)
 	vector.Push(1)
 	vector.Push(2)
 	vector.Push(3)
@@ -34,7 +34,7 @@ func TestVector_MarshalJSON(t *testing.T) {
 func TestVector_MarshalJSON2(t *testing.T) {
 	assertions := assert.New(t)
 
-	vector := MakeVector[int](0)
+	vector := NewVector[int](0)
 	vector.Push(1)
 	vector.Push(2)
 	vector.Push(3)

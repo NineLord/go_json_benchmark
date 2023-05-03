@@ -37,9 +37,9 @@ func GenerateJson(characterPoll string, numberOfLetters uint, depth uint, number
 func (jsonGenerator *jsonGenerator) generateFullTree() (map[string]interface{}, error) {
 	result := make(map[string]interface{})
 
-	currentNodes := Vector.MakeVector2[interface{}](1)
+	currentNodes := Vector.NewVector2[interface{}](1)
 	currentNodes.Push(result)
-	nextLevelNodes := Vector.MakeVector2[interface{}](0)
+	nextLevelNodes := Vector.NewVector2[interface{}](0)
 	lastLevel := jsonGenerator.depth - 1
 
 	for level := uint(0); level < jsonGenerator.depth; level++ {
@@ -60,8 +60,8 @@ func (jsonGenerator *jsonGenerator) generateFullTree() (map[string]interface{}, 
 					currentNode[jsonGenerator.getRandomNodeName()] = childNodeValue
 					nextLevelNodes.Push(childNodeValue)
 				}
-			case strings.HasPrefix(currentNodeType.Name(), "Vector"):
-				currentNode, _ := currentNode.(Vector.Vector[interface{}])
+			case strings.HasPrefix(currentNodeType.String(), "*Vector"):
+				currentNode, _ := currentNode.(*Vector.Vector[interface{}])
 				for _nodeCount := uint(0); _nodeCount < jsonGenerator.numberOfChildren; _nodeCount++ {
 					var childNodeValue interface{}
 					if level == lastLevel {
@@ -78,7 +78,7 @@ func (jsonGenerator *jsonGenerator) generateFullTree() (map[string]interface{}, 
 		}
 
 		currentNodes = nextLevelNodes
-		nextLevelNodes = Vector.MakeVector2[interface{}](0)
+		nextLevelNodes = Vector.NewVector2[interface{}](0)
 	}
 
 	return result, nil
