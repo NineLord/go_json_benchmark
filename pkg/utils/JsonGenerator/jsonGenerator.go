@@ -85,6 +85,7 @@ func (jsonGenerator *jsonGenerator) generateFullTree() (map[string]interface{}, 
 }
 
 // #region Helper methods
+
 func (jsonGenerator *jsonGenerator) getRandomNodeCharacter() *rune {
 	index := Randomizer.GetRandomIndexFromArray(jsonGenerator.characterPoll)
 	char := jsonGenerator.characterPoll[index]
