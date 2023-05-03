@@ -1,7 +1,8 @@
 package main
 
-//#region Imports
+// #region Imports
 import (
+	json2 "encoding/json"
 	"fmt"
 	"github.com/NineLord/go_json_benchmark/pkg/utils/JsonGenerator"
 	"github.com/urfave/cli/v2"
@@ -14,7 +15,7 @@ import (
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
-//#endregion
+// #endregion
 
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz"
 
@@ -87,7 +88,7 @@ func cliAction(arguments *cli.Context) (err error) {
 
 	if printFlag {
 		var byteArray []byte
-		byteArray, err = json.MarshalIndent(jsonResult, "", "  ")
+		byteArray, err = json2.MarshalIndent(jsonResult, "", "  ")
 		if err != nil {
 			return
 		}

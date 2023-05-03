@@ -1,12 +1,49 @@
 package main
 
 import (
+	// "encoding/json"
 	"fmt"
+	"github.com/NineLord/go_json_benchmark/pkg/utils/Vector"
+
+	jsoniter "github.com/json-iterator/go"
 	"reflect"
 )
 
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 func main() {
-	test3AddingToArray()
+	test6WhatTypeIsVector()
+}
+
+func test6WhatTypeIsVector() {
+	vec := Vector.MakeVector[int](0)
+	vec.Push(1)
+	vec.Push(2)
+
+	myType := reflect.TypeOf(vec)
+	fmt.Println(myType)
+}
+
+func test5Marshal() {
+	arr := []int{1, 2, 3}
+	res, err := json.Marshal(arr)
+	if err != nil {
+		panic(err)
+	}
+	println(string(res))
+}
+
+func test4Stringify() {
+	var data map[string]interface{}
+	if err := json.Unmarshal([]byte(`{"a": 1, "b": {"c": 2, "d": {"e": 3}}}`), &data); err != nil {
+		panic(err)
+	}
+	// jsonAsString, err := json.MarshalIndent(data, "", "  ")
+	jsonAsString, err := json.MarshalToString(data)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(jsonAsString))
 }
 
 func test3AddingToArray() {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NineLord/go_json_benchmark/pkg/utils/JsonType"
 	"github.com/NineLord/go_json_benchmark/pkg/utils/Randomizer"
+	"github.com/NineLord/go_json_benchmark/pkg/utils/Vector"
 	"reflect"
 	"strings"
 )
@@ -36,32 +37,18 @@ func GenerateJson(characterPoll string, numberOfLetters uint, depth uint, number
 func (jsonGenerator *jsonGenerator) generateFullTree() (map[string]interface{}, error) {
 	result := make(map[string]interface{})
 
-	currentNodes := make([]interface{}, 1)
-	currentNodes = append(currentNodes, result)
-	nextLevelNodes := make([]interface{}, 0)
+	currentNodes := Vector.MakeVector2[interface{}](1)
+	currentNodes.Push(result)
+	nextLevelNodes := Vector.MakeVector2[interface{}](0)
 	lastLevel := jsonGenerator.depth - 1
 
-	for level := uint(0); level < lastLevel; level++ {
+	for level := uint(0); level < jsonGenerator.depth; level++ {
 
-		for len(currentNodes) != 0 {
-			var currentNode interface{}
-			currentNode, currentNodes = currentNodes[len(currentNodes)-1], currentNodes[:len(currentNodes)-1] // Pop
-			currentNodeType := reflect.TypeOf(currentNode).Kind()
+		for currentNodes.Len() != 0 {
+			currentNode := currentNodes.Pop()
 
-			switch currentNodeType {
-			case reflect.Slice:
-				currentNode := currentNode.([]interface{})
-				for _nodeCount := uint(0); _nodeCount < jsonGenerator.numberOfChildren; _nodeCount++ {
-					var childNodeValue interface{}
-					if level == lastLevel {
-						childNodeValue = JsonType.GetRandomLeafJson()
-					} else {
-						childNodeValue = JsonType.GetRandomNoneLeafJson(jsonGenerator.numberOfChildren)
-					}
-					currentNode = append(currentNode, childNodeValue)
-					nextLevelNodes = append(nextLevelNodes, childNodeValue)
-				}
-			case reflect.Map:
+			switch currentNodeType := reflect.TypeOf(currentNode); {
+			case currentNodeType.Kind() == reflect.Map:
 				currentNode := currentNode.(map[string]interface{})
 				for _nodeCount := uint(0); _nodeCount < jsonGenerator.numberOfChildren; _nodeCount++ {
 					var childNodeValue interface{}
@@ -71,7 +58,19 @@ func (jsonGenerator *jsonGenerator) generateFullTree() (map[string]interface{}, 
 						childNodeValue = JsonType.GetRandomNoneLeafJson(jsonGenerator.numberOfChildren)
 					}
 					currentNode[jsonGenerator.getRandomNodeName()] = childNodeValue
-					nextLevelNodes = append(nextLevelNodes, childNodeValue)
+					nextLevelNodes.Push(childNodeValue)
+				}
+			case strings.HasPrefix(currentNodeType.Name(), "Vector"):
+				currentNode, _ := currentNode.(Vector.Vector[interface{}])
+				for _nodeCount := uint(0); _nodeCount < jsonGenerator.numberOfChildren; _nodeCount++ {
+					var childNodeValue interface{}
+					if level == lastLevel {
+						childNodeValue = JsonType.GetRandomLeafJson()
+					} else {
+						childNodeValue = JsonType.GetRandomNoneLeafJson(jsonGenerator.numberOfChildren)
+					}
+					currentNode.Push(childNodeValue)
+					nextLevelNodes.Push(childNodeValue)
 				}
 			default:
 				panic(fmt.Sprintf("generateFullTree unknown JSON type: %d", currentNodeType))
@@ -79,7 +78,7 @@ func (jsonGenerator *jsonGenerator) generateFullTree() (map[string]interface{}, 
 		}
 
 		currentNodes = nextLevelNodes
-		nextLevelNodes = make([]interface{}, 0)
+		nextLevelNodes = Vector.MakeVector2[interface{}](0)
 	}
 
 	return result, nil

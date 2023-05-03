@@ -3,6 +3,7 @@ package JsonType
 import (
 	"fmt"
 	"github.com/NineLord/go_json_benchmark/pkg/utils/Randomizer"
+	"github.com/NineLord/go_json_benchmark/pkg/utils/Vector"
 	"strings"
 )
 
@@ -27,18 +28,19 @@ var VariantsValueLeafTypes = [4]ValueLeafType{Null, Bool, Number, String}
 var ALPHABET = []rune("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz")
 
 func getRandomNoneLeafJsonType() ValueNonLeafType {
-	if Randomizer.GetRandomBoolean() {
-		return Array
-	} else {
-		return Object
-	}
+	// if Randomizer.GetRandomBoolean() { // Shaked-TODO
+	// 	return Array
+	// } else {
+	// 	return Object
+	// }
+	return Array
 }
 
 func GetRandomNoneLeafJson(numberOfChildren uint) interface{} {
 	jsonType := getRandomNoneLeafJsonType()
 	switch jsonType {
 	case Array:
-		return make([]interface{}, numberOfChildren, numberOfChildren)
+		return Vector.MakeVector2[interface{}](numberOfChildren)
 	case Object:
 		return make(map[string]interface{})
 	default:

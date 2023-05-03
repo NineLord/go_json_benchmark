@@ -1,18 +1,30 @@
 package Vector
 
+import (
+	jsoniter "github.com/json-iterator/go"
+)
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 type Vector[T any] struct {
 	data []T
 }
 
 // #region Constructors
 
-func MakeVector[T any](length uint64) Vector[T] {
+func MakeVector[T any](length uint) Vector[T] {
 	return Vector[T]{
 		data: make([]T, length),
 	}
 }
 
-func MakeVector2[T any](length, capacity uint64) Vector[T] {
+func MakeVector2[T any](capacity uint) Vector[T] {
+	return Vector[T]{
+		data: make([]T, 0, capacity),
+	}
+}
+
+func MakeVector3[T any](length, capacity uint) Vector[T] {
 	return Vector[T]{
 		data: make([]T, length, capacity),
 	}
@@ -43,5 +55,21 @@ func (vector *Vector[T]) Pop() T {
 func (vector *Vector[T]) GetAll() []T {
 	return vector.data[:]
 }
+
+func (vector *Vector[T]) Len() int {
+	return len(vector.data)
+}
+
+// #endregion
+
+// #region (Un)Marshaler Interface
+
+func (vector Vector[T]) MarshalJSON() ([]byte, error) { // Shaked-TODO
+	return json.Marshal(vector.data)
+}
+
+// func (vector *Vector[T]) UnmarshalJSON(data []byte) error {
+// 	return nil
+// }
 
 // #endregion
