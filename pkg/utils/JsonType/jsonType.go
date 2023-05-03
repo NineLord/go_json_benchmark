@@ -24,11 +24,6 @@ const (
 
 var VariantsValueLeafTypes = [4]ValueLeafType{Null, Bool, Number, String}
 
-// Generic Type: [ValueTypes valueTypes]
-type valueTypes interface {
-	ValueNonLeafType | ValueLeafType
-}
-
 var ALPHABET = []rune("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz")
 
 func getRandomNoneLeafJsonType() ValueNonLeafType {
