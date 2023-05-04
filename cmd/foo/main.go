@@ -12,11 +12,18 @@ import (
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func main() {
-	test6WhatTypeIsVector()
+	test7TypeOfNull()
+}
+
+func test7TypeOfNull() {
+	fmt.Println(reflect.TypeOf([]int{1, 2, 3}).Kind())
+	// fmt.Println(reflect.TypeOf(nil).Kind()) // Panic cus gO sMaRt!
+	x := reflect.TypeOf(nil)
+	fmt.Println(x)
 }
 
 func test6WhatTypeIsVector() {
-	vec := Vector.MakeVector[int](0)
+	vec := Vector.NewVector[int](0)
 	vec.Push(1)
 	vec.Push(2)
 
