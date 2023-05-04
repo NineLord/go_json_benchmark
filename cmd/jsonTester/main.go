@@ -3,6 +3,9 @@ package main
 // #region Imports
 import (
 	"fmt"
+	"github.com/NineLord/go_json_benchmark/pkg/searchTree/BreadthFirstSearch"
+	"github.com/NineLord/go_json_benchmark/pkg/searchTree/DepthFirstSearch"
+	"github.com/NineLord/go_json_benchmark/pkg/testJson/PcUsageExporter"
 	"github.com/NineLord/go_json_benchmark/pkg/utils/JsonGenerator"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/urfave/cli/v2"
@@ -10,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -118,28 +122,19 @@ func cliAction(arguments *cli.Context) (err error) {
 	}
 
 	// Shaked-TODO: create ExcelGenerator here
-	// var inputJsonFile string
 	var buffer []byte
 	if buffer, err = os.ReadFile(jsonPath); err != nil {
 		return
 	}
-	// inputJsonFile = string(buffer)
-	/*var inputJsonFile *os.File
-
-	inputJsonFile, err = os.Open(jsonPath)
-	if err != nil {
-		return
-	}
-	defer func() {
-		closeError := inputJsonFile.Close()
-		if err == nil {
-			err = closeError
-		}
-	}()*/
-	// valueToSearch := int64(2_000_000_000)
+	valueToSearch := float64(2_000_000_000)
 
 	for count := uint(0); count < testCounter; count++ {
-		// Shaked-TODO: create report class to collect Usage and data
+		// #region Test Preparations
+		mainSender := make(chan bool)
+		threadSender := make(chan []PcUsageExporter.PcUsage)
+		go PcUsageExporter.Main(threadSender, mainSender, sampleInterval)
+
+		// #endregion
 
 		// #region Testing
 
@@ -161,11 +156,19 @@ func cliAction(arguments *cli.Context) (err error) {
 		// #endregion
 
 		// #region Test Iterate Iteratively
-		// Shaked-TODO
+
+		if BreadthFirstSearch.Run(inputJsonFile, valueToSearch) {
+			return fmt.Errorf("BFS the tree found value that shouldn't be in it: %f", valueToSearch)
+		}
+
 		// #endregion
 
 		// #region Test Iterate Recursively
-		// Shaked-TODO
+
+		if DepthFirstSearch.Run(inputJsonFile, valueToSearch) {
+			return fmt.Errorf("DFS the tree found value that shouldn't be in it: %f", valueToSearch)
+		}
+
 		// #endregion
 
 		// #region Test Serialize JSON
@@ -177,6 +180,14 @@ func cliAction(arguments *cli.Context) (err error) {
 		_ = string(buff)
 
 		// #endregion
+
+		time.Sleep(5 * time.Second)
+		mainSender <- true
+		close(mainSender)
+		pcUsages := <-threadSender
+		for _, pcUsage := range pcUsages {
+			fmt.Printf("CPU: %.3f%% \t RAM: %.3fMB\n", pcUsage.Cpu, pcUsage.Ram)
+		}
 
 		// #endregion
 	}
