@@ -6,6 +6,7 @@ import (
 	"github.com/NineLord/go_json_benchmark/pkg/searchTree/BreadthFirstSearch"
 	"github.com/NineLord/go_json_benchmark/pkg/searchTree/DepthFirstSearch"
 	"github.com/NineLord/go_json_benchmark/pkg/testJson/PcUsageExporter"
+	"github.com/NineLord/go_json_benchmark/pkg/testJson/Reporter"
 	"github.com/NineLord/go_json_benchmark/pkg/utils/JsonGenerator"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/urfave/cli/v2"
@@ -13,7 +14,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"time"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -31,6 +31,8 @@ func getDefaultPathToSaveFile() cli.Path {
 		panic(fmt.Sprintf("Didn't get result and couldn't get default path, error: %s", err))
 	}
 }
+
+// make clean jsonTester && clear && ./bin/jsonTester -i 50 -n 3 -d 2 -m 2 -D ./junk/input.json 1
 
 func main() {
 	app := &cli.App{
@@ -130,6 +132,7 @@ func cliAction(arguments *cli.Context) (err error) {
 
 	for count := uint(0); count < testCounter; count++ {
 		// #region Test Preparations
+		reporter := Reporter.NewReporter()
 		mainSender := make(chan bool)
 		threadSender := make(chan []PcUsageExporter.PcUsage)
 		go PcUsageExporter.Main(threadSender, mainSender, sampleInterval)
@@ -138,55 +141,50 @@ func cliAction(arguments *cli.Context) (err error) {
 
 		// #region Testing
 
-		// #region Test Generating JSON
-
-		if _, err = JsonGenerator.GenerateJson(CharacterPoll, numberOfLetters, depth, numberOfChildren); err != nil {
+		if _, err = reporter.Measure("Test Generating JSON", func() (any, error) {
+			return JsonGenerator.GenerateJson(CharacterPoll, numberOfLetters, depth, numberOfChildren)
+		}); err != nil {
 			return
 		}
-
-		// #endregion
-
-		// #region Test Deserialize JSON
 
 		var inputJsonFile map[string]interface{}
-		if err = json.Unmarshal(buffer, &inputJsonFile); err != nil {
+		if _, err = reporter.Measure("Test Deserialize JSON", func() (any, error) {
+			return nil, json.Unmarshal(buffer, &inputJsonFile)
+		}); err != nil {
 			return
 		}
 
-		// #endregion
-
-		// #region Test Iterate Iteratively
-
-		if BreadthFirstSearch.Run(inputJsonFile, valueToSearch) {
+		if found, _ := reporter.Measure("Test Iterate Iteratively", func() (any, error) {
+			return BreadthFirstSearch.Run(inputJsonFile, valueToSearch), nil
+		}); found == true {
 			return fmt.Errorf("BFS the tree found value that shouldn't be in it: %f", valueToSearch)
 		}
 
-		// #endregion
-
-		// #region Test Iterate Recursively
-
-		if DepthFirstSearch.Run(inputJsonFile, valueToSearch) {
+		if found, _ := reporter.Measure("Test Iterate Recursively", func() (any, error) {
+			return DepthFirstSearch.Run(inputJsonFile, valueToSearch), nil
+		}); found == true {
 			return fmt.Errorf("DFS the tree found value that shouldn't be in it: %f", valueToSearch)
 		}
 
-		// #endregion
-
-		// #region Test Serialize JSON
-
-		var buff []byte
-		if buff, err = json.Marshal(inputJsonFile); err != nil {
+		if _, err = reporter.Measure("Test Serialize JSON", func() (any, error) {
+			var buff []byte
+			var err error
+			if buff, err = json.Marshal(inputJsonFile); err != nil {
+				return nil, err
+			}
+			return string(buff), nil
+		}); err != nil {
 			return
 		}
-		_ = string(buff)
 
-		// #endregion
-
-		time.Sleep(5 * time.Second)
 		mainSender <- true
 		close(mainSender)
 		pcUsages := <-threadSender
 		for _, pcUsage := range pcUsages {
 			fmt.Printf("CPU: %.3f%% \t RAM: %.3fMB\n", pcUsage.Cpu, pcUsage.Ram)
+		}
+		for measureName, measureDuration := range reporter.GetMeasures() {
+			fmt.Printf("%s : \t %d\n", measureName, measureDuration)
 		}
 
 		// #endregion
