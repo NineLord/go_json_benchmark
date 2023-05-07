@@ -3,9 +3,13 @@ package main
 import (
 	// "encoding/json"
 	"fmt"
+	"github.com/NineLord/go_json_benchmark/pkg/testJson/ExcelGenerator"
+	"github.com/NineLord/go_json_benchmark/pkg/testJson/PcUsageExporter"
+	"github.com/NineLord/go_json_benchmark/pkg/utils/MathDataCollector"
 	"github.com/NineLord/go_json_benchmark/pkg/utils/Vector"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/struCoder/pidusage"
+	"github.com/xuri/excelize/v2"
 	"os"
 	"reflect"
 	"time"
@@ -14,7 +18,96 @@ import (
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func main() {
-	test13ThreadGetMeTimeForFkSake()
+	test16ExcelGenerator()
+}
+
+func test16ExcelGenerator() {
+	excelGenerator, err := ExcelGenerator.NewExcelGenerator("/tmp/some.json", 10, 3, 2, 2)
+	if err != nil {
+		panic(err)
+	}
+	measures := make(map[string]int64)
+	measures["Test Generating JSON"] = 1
+	measures["Test Deserialize JSON"] = 2
+	measures["Test Iterate Iteratively"] = 3
+	measures["Test Iterate Recursively"] = 4
+	measures["Test Serialize JSON"] = 5
+	pcUsages := []PcUsageExporter.PcUsage{
+		{Cpu: 10.0, Ram: 1000},
+		{Cpu: 25.0, Ram: 1500},
+		{Cpu: 50.0, Ram: 2000},
+	}
+	if err := excelGenerator.AppendWorksheet("Testing 1", measures, pcUsages); err != nil {
+		panic(err)
+	}
+	measures = make(map[string]int64)
+	measures["Test Generating JSON"] = 2
+	measures["Test Deserialize JSON"] = 3
+	measures["Test Iterate Iteratively"] = 4
+	measures["Test Iterate Recursively"] = 5
+	measures["Test Serialize JSON"] = 6
+	pcUsages = []PcUsageExporter.PcUsage{
+		{Cpu: 10.0, Ram: 200},
+		{Cpu: 25.0, Ram: 300},
+		{Cpu: 25.0, Ram: 400},
+	}
+	if err := excelGenerator.AppendWorksheet("Testing 2", measures, pcUsages); err != nil {
+		panic(err)
+	}
+	if err := excelGenerator.SaveAs("/mnt/c/Users/Shaked/Documents/Mine/IdeaProjects/go_json_benchmark/junk/report.xlsx"); err != nil {
+		panic(err)
+	}
+}
+
+func test15MathDataCollector() {
+	dataCollector := MathDataCollector.MakeMathDataCollector()
+	dataCollector.Add(1.0)
+	fmt.Println(dataCollector.Minimum)
+}
+
+func test14PlayWithExcel() {
+	report := excelize.NewFile()
+	defer func() {
+		if err := report.Close(); err != nil {
+			panic(err)
+		}
+	}()
+	if _, err := report.NewSheet("TestingSheetName"); err != nil {
+		panic(err)
+	}
+	if err := report.SetPanes("TestingSheetName", &excelize.Panes{
+		Freeze:      true,
+		YSplit:      1,
+		TopLeftCell: "A2",
+		ActivePane:  "bottomLeft",
+	}); err != nil {
+		panic(err)
+	}
+	if err := report.DeleteSheet("Sheet1"); err != nil {
+		panic(err)
+	}
+	if err := report.SetCellDefault("TestingSheetName", "B4", "hello"); err != nil {
+		panic(err)
+	}
+	if err := report.SetRowHeight("TestingSheetName", 4, 100); err != nil {
+		panic(err)
+	}
+	if style, err := report.NewStyle(&excelize.Style{
+		Border: []excelize.Border{
+			{Type: "left", Color: "000000", Style: 1},
+			{Type: "right", Color: "000000", Style: 1},
+			{Type: "top", Color: "000000", Style: 1},
+			{Type: "bottom", Color: "000000", Style: 1},
+		},
+		Alignment: &excelize.Alignment{Horizontal: "center", Vertical: "center"},
+	}); err != nil {
+		panic(err)
+	} else if err := report.SetCellStyle("TestingSheetName", "B4", "B4", style); err != nil {
+		panic(err)
+	}
+	if err := report.SaveAs("/mnt/c/Users/Shaked/Documents/Mine/IdeaProjects/go_json_benchmark/junk/report.xlsx"); err != nil {
+		panic(err)
+	}
 }
 
 func test13ThreadGetMeTimeForFkSake() {
