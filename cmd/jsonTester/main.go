@@ -33,7 +33,7 @@ func getDefaultPathToSaveFile() cli.Path {
 	}
 }
 
-// Example: make clean jsonTester && clear && ./bin/jsonTester -i 50 -n 3 -d 2 -m 2 -s ./junk/report4.xlsx -D ./junk/input.json 2
+// Example: make clean jsonTester && clear && ./bin/jsonTester -i 10 -n 8 -d 10 -m 5 -s ./junk/report4.xlsx -D /mnt/c/Users/Shaked/Documents/Mine/IdeaProjects/rust_json_benchmark/junk/hugeJson_numberOfLetters8_depth10_children5.json 5
 
 func main() {
 	app := &cli.App{

@@ -1,5 +1,7 @@
 #region Parameters
 GO_COMPILER = go
+GO_COMPILER_FLAGS =
+GO_COMPILER_RELEASE_FLAGS = -ldflags "-s -w"
 COMMAND_DIRECTORY = ./cmd
 COMMAND_FILE_NAME = main.go
 PACKAGE_DIRECTORY = ./pkg
@@ -30,10 +32,16 @@ help:
 
 	@echo ''
 	@echo 'To compile all executables use the target: ${CYAN}all${RESET}'
+	@echo 'To compile all executables with optimized binary use the target: ${CYAN}release${RESET}'
 #endregion
 
 #region Target to compile all executables at once
 all: $(COMMAND_FILES)
+#endregion
+
+#region Target to compile all executables at once with release mode flags
+release: GO_COMPILER_FLAGS += $(GO_COMPILER_RELEASE_FLAGS)
+release: $(COMMAND_FILES)
 #endregion
 
 #region Target for each executable files to be compiled
@@ -42,7 +50,7 @@ $(COMMAND_FILES):
 	@mkdir -p $(BINARY_DIRECTORY)
 
 	@echo "$(PREFIX_TO_PRINTS)${GREEN}Compiling $@${RESET}"
-	$(GO_COMPILER) build -o $(BINARY_DIRECTORY)/$@ $(COMMAND_DIRECTORY)/$@/$(COMMAND_FILE_NAME)
+	$(GO_COMPILER) build $(GO_COMPILER_FLAGS) -o $(BINARY_DIRECTORY)/$@ $(COMMAND_DIRECTORY)/$@/$(COMMAND_FILE_NAME)
 #endregion
 
 #region Target for running specific build
