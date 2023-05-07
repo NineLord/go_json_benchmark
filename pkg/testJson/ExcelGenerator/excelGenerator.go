@@ -258,7 +258,7 @@ func (excelGenerator *ExcelGenerator) addData(worksheetName string, measures map
 			return err
 		}
 	}
-	if average, err := columnRamUsage.Average(); err != nil {
+	if average, err := columnRamUsage.Average(); err == nil {
 		if err := setCellFloat64AndStyle(excelGenerator.workbook, worksheetName, "B10", average, excelGenerator.formatBorderCenter); err != nil {
 			return err
 		}
