@@ -193,30 +193,31 @@ func (excelGenerator *ExcelGenerator) addData(worksheetName string, measures map
 	// #region JSON Manipulations
 
 	for testName, testResult := range measures {
+		intTestResult := int(testResult)
 		float64TestResult := float64(testResult)
 		switch testName {
 		case "Test Generating JSON":
-			if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B2", testResult, excelGenerator.formatBorderCenter); err != nil {
+			if err := setCellIntAndStyle(excelGenerator.workbook, worksheetName, "B2", intTestResult, excelGenerator.formatBorderCenter); err != nil {
 				return err
 			}
 			excelGenerator.mathDataCollectors.averageGeneratingJsons.Add(float64TestResult)
 		case "Test Deserialize JSON":
-			if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B3", testResult, excelGenerator.formatBorderCenter); err != nil {
+			if err := setCellIntAndStyle(excelGenerator.workbook, worksheetName, "B3", intTestResult, excelGenerator.formatBorderCenter); err != nil {
 				return err
 			}
 			excelGenerator.mathDataCollectors.averageIteratingJsonsIteratively.Add(float64TestResult)
 		case "Test Iterate Iteratively":
-			if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B4", testResult, excelGenerator.formatBorderCenter); err != nil {
+			if err := setCellIntAndStyle(excelGenerator.workbook, worksheetName, "B4", intTestResult, excelGenerator.formatBorderCenter); err != nil {
 				return err
 			}
 			excelGenerator.mathDataCollectors.averageIteratingJsonsRecursively.Add(float64TestResult)
 		case "Test Iterate Recursively":
-			if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B5", testResult, excelGenerator.formatBorderCenter); err != nil {
+			if err := setCellIntAndStyle(excelGenerator.workbook, worksheetName, "B5", intTestResult, excelGenerator.formatBorderCenter); err != nil {
 				return err
 			}
 			excelGenerator.mathDataCollectors.averageDeserializingJsons.Add(float64TestResult)
 		case "Test Serialize JSON":
-			if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B6", testResult, excelGenerator.formatBorderCenter); err != nil {
+			if err := setCellIntAndStyle(excelGenerator.workbook, worksheetName, "B6", intTestResult, excelGenerator.formatBorderCenter); err != nil {
 				return err
 			}
 			excelGenerator.mathDataCollectors.averageSerializingJsons.Add(float64TestResult)
@@ -236,10 +237,10 @@ func (excelGenerator *ExcelGenerator) addData(worksheetName string, measures map
 
 	currentRowNumber := 2
 	for _, pcUsage := range pcUsages {
-		if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "D"+strconv.Itoa(currentRowNumber), pcUsage.Cpu, excelGenerator.formatBorderCenter); err != nil {
+		if err := setCellFloat64AndStyle(excelGenerator.workbook, worksheetName, "D"+strconv.Itoa(currentRowNumber), pcUsage.Cpu, excelGenerator.formatBorderCenter); err != nil {
 			return err
 		}
-		if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "E"+strconv.Itoa(currentRowNumber), pcUsage.Ram, excelGenerator.formatBorderCenter); err != nil {
+		if err := setCellFloat64AndStyle(excelGenerator.workbook, worksheetName, "E"+strconv.Itoa(currentRowNumber), pcUsage.Ram, excelGenerator.formatBorderCenter); err != nil {
 			return err
 		}
 
@@ -252,15 +253,15 @@ func (excelGenerator *ExcelGenerator) addData(worksheetName string, measures map
 		currentRowNumber++
 	}
 
-	if average, err := columnCpuUsage.Average(); err != nil {
-		return err
-	} else if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B9", average, excelGenerator.formatBorderCenter); err != nil {
-		return err
+	if average, err := columnCpuUsage.Average(); err == nil {
+		if err := setCellFloat64AndStyle(excelGenerator.workbook, worksheetName, "B9", average, excelGenerator.formatBorderCenter); err != nil {
+			return err
+		}
 	}
 	if average, err := columnRamUsage.Average(); err != nil {
-		return err
-	} else if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B10", average, excelGenerator.formatBorderCenter); err != nil {
-		return err
+		if err := setCellFloat64AndStyle(excelGenerator.workbook, worksheetName, "B10", average, excelGenerator.formatBorderCenter); err != nil {
+			return err
+		}
 	}
 
 	// #endregion
@@ -349,23 +350,23 @@ func (excelGenerator *ExcelGenerator) addAverageData(worksheetName string) error
 		if err != nil {
 			continue
 		}
-		if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B"+strconv.Itoa(cellRow), average, excelGenerator.formatBorderCenter); err != nil {
+		if err := setCellFloat64AndStyle(excelGenerator.workbook, worksheetName, "B"+strconv.Itoa(cellRow), average, excelGenerator.formatBorderCenter); err != nil {
 			return nil
 		}
 		totalAverages.Add(average)
 	}
-	if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B7", totalAverages.Sum, excelGenerator.formatBorderCenter); err != nil {
+	if err := setCellFloat64AndStyle(excelGenerator.workbook, worksheetName, "B7", totalAverages.Sum, excelGenerator.formatBorderCenter); err != nil {
 		return err
 	}
 
 	if average, err := excelGenerator.mathDataCollectors.totalAverageCpu.Average(); err == nil {
-		if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B9", average, excelGenerator.formatBorderCenter); err != nil {
+		if err := setCellFloat64AndStyle(excelGenerator.workbook, worksheetName, "B9", average, excelGenerator.formatBorderCenter); err != nil {
 			return err
 		}
 	}
 
 	if average, err := excelGenerator.mathDataCollectors.totalAverageRam.Average(); err == nil {
-		if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B10", average, excelGenerator.formatBorderCenter); err != nil {
+		if err := setCellFloat64AndStyle(excelGenerator.workbook, worksheetName, "B10", average, excelGenerator.formatBorderCenter); err != nil {
 			return err
 		}
 	}
@@ -393,28 +394,28 @@ func (excelGenerator *ExcelGenerator) addAboutWorksheet() error {
 	if err := setCellDefaultAndStyle(excelGenerator.workbook, worksheetName, "A2", "CPU/RAM Sampling Interval (milliseconds)", excelGenerator.formatBorder); err != nil {
 		return err
 	}
-	if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B2", excelGenerator.aboutInformation.sampleInterval, excelGenerator.formatBorder); err != nil {
+	if err := setCellIntAndStyle(excelGenerator.workbook, worksheetName, "B2", int(excelGenerator.aboutInformation.sampleInterval), excelGenerator.formatBorder); err != nil {
 		return err
 	}
 
 	if err := setCellDefaultAndStyle(excelGenerator.workbook, worksheetName, "A3", "Number of letters to generate for each node in the generated JSON tree", excelGenerator.formatBorder); err != nil {
 		return err
 	}
-	if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B3", excelGenerator.aboutInformation.numberOfLetters, excelGenerator.formatBorder); err != nil {
+	if err := setCellIntAndStyle(excelGenerator.workbook, worksheetName, "B3", int(excelGenerator.aboutInformation.numberOfLetters), excelGenerator.formatBorder); err != nil {
 		return err
 	}
 
 	if err := setCellDefaultAndStyle(excelGenerator.workbook, worksheetName, "A4", "Depth of the generated JSON tree", excelGenerator.formatBorder); err != nil {
 		return err
 	}
-	if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B4", excelGenerator.aboutInformation.depth, excelGenerator.formatBorder); err != nil {
+	if err := setCellIntAndStyle(excelGenerator.workbook, worksheetName, "B4", int(excelGenerator.aboutInformation.depth), excelGenerator.formatBorder); err != nil {
 		return err
 	}
 
 	if err := setCellDefaultAndStyle(excelGenerator.workbook, worksheetName, "A5", "Number of children each node in the generated JSON tree going to have", excelGenerator.formatBorder); err != nil {
 		return err
 	}
-	if err := setCellValueAndStyle(excelGenerator.workbook, worksheetName, "B5", excelGenerator.aboutInformation.numberOfChildren, excelGenerator.formatBorder); err != nil {
+	if err := setCellIntAndStyle(excelGenerator.workbook, worksheetName, "B5", int(excelGenerator.aboutInformation.numberOfChildren), excelGenerator.formatBorder); err != nil {
 		return err
 	}
 
@@ -445,8 +446,8 @@ func setCellIntAndStyle(workbook *excelize.File, worksheetName, cell string, val
 	return nil
 }
 
-func setCellValueAndStyle(workbook *excelize.File, worksheetName, cell string, value interface{}, style int) error {
-	if err := workbook.SetCellValue(worksheetName, cell, value); err != nil {
+func setCellFloat64AndStyle(workbook *excelize.File, worksheetName, cell string, value float64, style int) error {
+	if err := workbook.SetCellFloat(worksheetName, cell, value, 2, 64); err != nil {
 		return err
 	}
 	if err := workbook.SetCellStyle(worksheetName, cell, cell, style); err != nil {

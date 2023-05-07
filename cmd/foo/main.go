@@ -17,6 +17,8 @@ import (
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
+// Example: make clean foo && clear  && ./bin/foo
+
 func main() {
 	test16ExcelGenerator()
 }

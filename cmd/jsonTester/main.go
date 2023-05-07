@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/NineLord/go_json_benchmark/pkg/searchTree/BreadthFirstSearch"
 	"github.com/NineLord/go_json_benchmark/pkg/searchTree/DepthFirstSearch"
+	"github.com/NineLord/go_json_benchmark/pkg/testJson/ExcelGenerator"
 	"github.com/NineLord/go_json_benchmark/pkg/testJson/PcUsageExporter"
 	"github.com/NineLord/go_json_benchmark/pkg/testJson/Reporter"
 	"github.com/NineLord/go_json_benchmark/pkg/utils/JsonGenerator"
@@ -24,15 +25,15 @@ var CharacterPoll = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz!@#$%&"
 
 func getDefaultPathToSaveFile() cli.Path {
 	if homeDir, err := os.UserHomeDir(); err == nil {
-		return homeDir
+		return homeDir + "/report4.xlsx"
 	} else if executable, err := os.Executable(); err == nil {
-		return filepath.Dir(executable)
+		return filepath.Dir(executable) + "/report4.xlsx"
 	} else {
 		panic(fmt.Sprintf("Didn't get result and couldn't get default path, error: %s", err))
 	}
 }
 
-// make clean jsonTester && clear && ./bin/jsonTester -i 50 -n 3 -d 2 -m 2 -D ./junk/input.json 1
+// Example: make clean jsonTester && clear && ./bin/jsonTester -i 50 -n 3 -d 2 -m 2 -s ./junk/report4.xlsx -D ./junk/input.json 2
 
 func main() {
 	app := &cli.App{
@@ -123,7 +124,10 @@ func cliAction(arguments *cli.Context) (err error) {
 		)
 	}
 
-	// Shaked-TODO: create ExcelGenerator here
+	var excelGenerator *ExcelGenerator.ExcelGenerator
+	if excelGenerator, err = ExcelGenerator.NewExcelGenerator(jsonPath, sampleInterval, numberOfLetters, depth, numberOfChildren); err != nil {
+		return
+	}
 	var buffer []byte
 	if buffer, err = os.ReadFile(jsonPath); err != nil {
 		return
@@ -180,15 +184,19 @@ func cliAction(arguments *cli.Context) (err error) {
 		mainSender <- true
 		close(mainSender)
 		pcUsages := <-threadSender
-		for _, pcUsage := range pcUsages {
+		/*for _, pcUsage := range pcUsages {
 			fmt.Printf("CPU: %.3f%% \t RAM: %.3fMB\n", pcUsage.Cpu, pcUsage.Ram)
 		}
 		for measureName, measureDuration := range reporter.GetMeasures() {
 			fmt.Printf("%s : \t %d\n", measureName, measureDuration)
+		}*/
+		if err = excelGenerator.AppendWorksheet("Test "+strconv.Itoa(int(count)+1), reporter.GetMeasures(), pcUsages); err != nil {
+			return
 		}
 
 		// #endregion
 	}
 
-	return nil
+	err = excelGenerator.SaveAs(pathToSaveFile)
+	return
 }
