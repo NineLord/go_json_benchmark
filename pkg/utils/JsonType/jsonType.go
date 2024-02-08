@@ -23,6 +23,10 @@ const (
 	String
 )
 
+func (valueLeafType *ValueLeafType) GetNumber() uint {
+	return uint(*valueLeafType)
+}
+
 var VariantsValueLeafTypes = [4]ValueLeafType{Null, Bool, Number, String}
 
 var ALPHABET = []rune("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz")

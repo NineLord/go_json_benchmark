@@ -41,6 +41,22 @@ func (mathDataCollector *MathDataCollector) Add(data float64) {
 	}
 }
 
+func (mathDataCollector *MathDataCollector) GetMinimum() float64 {
+	return mathDataCollector.Minimum
+}
+
+func (mathDataCollector *MathDataCollector) GetMaximum() float64 {
+	return mathDataCollector.Maximum
+}
+
+func (mathDataCollector *MathDataCollector) GetSum() float64 {
+	return mathDataCollector.Sum
+}
+
+func (mathDataCollector *MathDataCollector) GetCount() uint64 {
+	return mathDataCollector.Count
+}
+
 func (mathDataCollector *MathDataCollector) Average() (float64, error) {
 	switch mathDataCollector.Count {
 	case 0:
@@ -49,3 +65,4 @@ func (mathDataCollector *MathDataCollector) Average() (float64, error) {
 		return mathDataCollector.Sum / float64(mathDataCollector.Count), nil
 	}
 }
+

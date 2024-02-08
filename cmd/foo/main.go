@@ -2,7 +2,13 @@ package main
 
 import (
 	// "encoding/json"
+	"errors"
 	"fmt"
+	"math"
+	"os"
+	"reflect"
+	"time"
+
 	"github.com/NineLord/go_json_benchmark/pkg/testJson/ExcelGenerator"
 	"github.com/NineLord/go_json_benchmark/pkg/testJson/PcUsageExporter"
 	"github.com/NineLord/go_json_benchmark/pkg/utils/MathDataCollector"
@@ -10,9 +16,6 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/struCoder/pidusage"
 	"github.com/xuri/excelize/v2"
-	"os"
-	"reflect"
-	"time"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -20,7 +23,33 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 // Example: make clean foo && clear  && ./bin/foo
 
 func main() {
-	test16ExcelGenerator()
+	divide(1,2)
+}
+
+func divide(dividend int, divisor int) (float64, error) {
+	if divisor == 0 {
+		return math.NaN(), errors.New("trying to divide by 0")
+	} else {
+		return float64(dividend) / float64(divisor), nil
+	}
+}
+
+
+// func test17HighLevelProgramming(x ...int) (...[]interface{}) {
+// 	return 0, 0
+// }
+
+func test17Oop() {
+	myVec1 := Vector.NewVector[int](0)
+	innerSlice1 := myVec1.GetAll()
+	fmt.Println("innerSlice1", len(innerSlice1), cap(innerSlice1))
+	myVec1.Push(1)
+	fmt.Println(myVec1)
+	myVec2 := Vector.Vector[int]{}
+	innerSlice2 := myVec2.GetAll()
+	fmt.Println("innerSlice2", len(innerSlice2), cap(innerSlice2))
+	myVec2.Push(1)
+	fmt.Println(myVec2)
 }
 
 func test16ExcelGenerator() {

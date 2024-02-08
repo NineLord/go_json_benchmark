@@ -68,8 +68,5 @@ func (vector *Vector[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(vector.data)
 }
 
-// func (vector *Vector[T]) UnmarshalJSON(data []byte) error {
-// 	return nil
-// }
-
 // #endregion
+
